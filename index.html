@@ -21,7 +21,10 @@
 <body>
     <div class="container">
         <h1>🔗 URL Shortener</h1>
-        <input type="url" id="longUrl" placeholder="Enter long URL (e.g., https://www.google.com)" required>
+
+        <input type="text" id="longUrl" placeholder="google.com or https://www.google.com" pattern=".*">
+
+
         <button id="shortenBtn">Shorten URL</button>
         <div id="result">
             <div id="shortUrl"></div>
