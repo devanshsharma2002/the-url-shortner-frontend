@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RockyCOC URL Shortener</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; }
+        .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 500px; width: 90%; text-align: center; }
+        h1 { color: #333; margin-bottom: 1rem; }
+        input { width: 100%; padding: 1rem; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; margin-bottom: 1rem; }
+        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: transform 0.2s; }
+        button:hover { transform: scale(1.05); }
+        #result { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 10px; display: none; }
+        #shortUrl { color: #667eea; word-break: break-all; margin-bottom: 0.5rem; }
+        #copyBtn { background: #28a745; padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 URL Shortener</h1>
+        <input type="url" id="longUrl" placeholder="Enter long URL (e.g., https://www.google.com)" required>
+        <button id="shortenBtn">Shorten URL</button>
+        <div id="result">
+            <div id="shortUrl"></div>
+            <button id="copyBtn">Copy</button>
+            <div id="error" class="error"></div>
+        </div>
+    </div>
+    <script>
+        const BACKEND_URL = 'https://the-url-shortner.onrender.com';  // Update to your Render backend URL
+        const shortenBtn = document.getElementById('shortenBtn');
+        const longUrlInput = document.getElementById('longUrl');
+        const result = document.getElementById('result');
+        const shortUrlDiv = document.getElementById('shortUrl');
+        const copyBtn = document.getElementById('copyBtn');
+        const errorDiv = document.getElementById('error');
+
+        shortenBtn.addEventListener('click', async () => {
+            const longUrl = longUrlInput.value.trim();
+            if (!longUrl) return;
+            shortenBtn.textContent = 'Shortening...';
+            try {
+                const res = await fetch(`${BACKEND_URL}/shorten`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: longUrl })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    shortUrlDiv.textContent = data.short_url;
+                    result.style.display = 'block';
+                    errorDiv.textContent = '';
+                } else {
+                    errorDiv.textContent = data.error || 'Error shortening URL';
+                    result.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error - check backend URL';
+                result.style.display = 'block';
+            }
+            shortenBtn.textContent = 'Shorten URL';
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(shortUrlDiv.textContent).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+            });
+        });
+    </script>
+</body>
+</html>
